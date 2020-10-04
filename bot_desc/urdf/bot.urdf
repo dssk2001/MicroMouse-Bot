@@ -1,0 +1,205 @@
+<robot name="final_robot">
+
+<!-- Base Link   -->
+<link name="base_link">
+    <inertial>
+      <mass value="50"/>
+      <inertia
+        ixx="1.0" ixy="0.0" ixz="0.0"
+        iyy="1.0" iyz="0.0"
+        izz="1.0" />
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.20 0.25 0.20" />
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </visual>
+    <collision name="b1_coll">
+      <geometry>
+        <box size="0.20 0.25 0.20" />
+      </geometry>
+    </collision>
+    
+</link>
+
+<!-- Left Wheel Link  and Joint-->
+ 
+  <link name="left_wheel">
+    <inertial>
+      <mass value="10"/>
+      <inertia
+        ixx="1.0" ixy="0.0" ixz="0.0"
+        iyy="1.0" iyz="0.0"
+        izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57075 0 0"/>
+      <geometry>
+        <cylinder radius="0.08" length="0.03"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.57075 0 0"/>
+      <geometry>
+        <cylinder radius="0.08" length="0.03"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_wheel_joint" type="continuous">
+    <axis xyz="0 1 0" rpy="0 0 0" />
+    <parent link="base_link"/>
+    <child link="left_wheel"/>
+    <origin xyz="0.1 0.15 -0.1" rpy="0 0 0"/>
+  </joint>
+  
+<!--  Right Wheel Link and Joint-->  
+  
+  <link name="right_wheel">
+    <inertial>
+      <mass value="10"/>
+      <inertia
+        ixx="1.0" ixy="0.0" ixz="0.0"
+        iyy="1.0" iyz="0.0"
+        izz="1.0"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.57075 0 0"/>
+      <geometry>
+        <cylinder radius="0.08" length="0.03"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.57075 0 0"/>
+      <geometry>
+        <cylinder radius="0.08" length="0.03"/>
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_wheel_joint" type="continuous">
+    <axis xyz="0 1 0" rpy="0 0 0" />
+    <parent link="base_link"/>
+    <child link="right_wheel"/>
+    <origin xyz="0.1 -0.15 -0.1" rpy="0 0 0"/>
+  </joint>  
+  
+<!-- Front Caster Wheel and Joint -->  
+  
+ <link name="front_wheel">
+    <inertial>
+      <mass value="10"/>
+      <inertia
+        ixx="1.0" ixy="0.0" ixz="0.0"
+        iyy="1.0" iyz="0.0"
+        izz="1.0"/>
+    </inertial>
+    <visual name="front_ball">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.04"/>
+      </geometry>
+    </visual>
+    <collision name="front_collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.04"/>
+      </geometry>        
+    </collision>
+  </link> 
+   
+<joint name="front_wheel_joint" type="continuous">
+    <axis xyz="0 1 0" rpy="0 0 0" />
+    <parent link="base_link"/>
+    <child link="front_wheel"/>
+    <origin xyz="-0.0625 0 -0.14" rpy="0 0 0"/>
+  </joint> 
+  
+  
+  <link name="sensor_top">
+    <inertial>
+     <origin xyz="0 0 0" rpy="0 0 0" />
+     <mass value="0.1" />
+     <inertia
+      ixx="0.2" ixy="0" ixz="0"
+      iyy="0.2" iyz="0"
+      izz="0.2" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+       <cylinder radius="0.01" length="0.02" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+       <cylinder radius="0.01" length="0.02"/>
+      </geometry>
+    </collision>  
+  </link>
+  <joint name="sensor_top_joint" type="fixed">
+  <origin xyz="0 0 0.11" rpy="0 0 0"/>
+  <parent link="base_link"/>
+  <child link="sensor_top"/>
+  </joint>
+  
+  <gazebo reference="sensor_top">
+    <sensor type="gpu_ray" name="front_laser_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>100</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>180</samples>
+            <resolution>1</resolution>
+            <min_angle>1.57</min_angle>
+            <max_angle>4.71</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.1</min> 
+          <max>30.0</max> 
+          <resolution>0.01</resolution>
+        </range>
+      </ray>
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_gpu_laser.so">
+        <topicName>scan_top</topicName>
+        <frameName>sensor_top_laser</frameName>
+      </plugin>
+      </sensor>
+      </gazebo>
+      
+ <gazebo>
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <alwaysOn>true</alwaysOn>
+      <legacyMode>false</legacyMode>
+      <updateRate>40</updateRate>
+      <leftJoint>left_wheel_joint</leftJoint>
+      <rightJoint>right_wheel_joint</rightJoint>
+      <wheelSeparation>0.25</wheelSeparation>
+      <wheelDiameter>0.16</wheelDiameter>
+      <torque>20</torque>
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <robotBaseFrame>base_link</robotBaseFrame>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="base_link">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="front_wheel">
+    <material>Gazebo/Green</material>
+  </gazebo>
+  <gazebo reference="right_wheel">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  <gazebo reference="left_wheel">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  
+</robot>
+      
+  
